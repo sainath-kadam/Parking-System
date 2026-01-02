@@ -1,4 +1,4 @@
-export default function validate(schema) {
+export function validate(schema) {
   return (req, res, next) => {
     const { error, value } = schema.validate(req.body, {
       abortEarly: false
