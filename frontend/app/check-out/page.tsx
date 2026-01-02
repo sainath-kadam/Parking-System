@@ -1,8 +1,6 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { checkOut, getActiveEntry } from '@/services/api';
 import styles from './page.module.scss';
 
@@ -133,9 +131,6 @@ export default function CheckOutPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-
-    
-
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
             <label>Vehicle Number or Token ID *</label>
@@ -156,7 +151,6 @@ export default function CheckOutPage() {
               </div>
             )}
           </div>
-
           <div className={styles.formGroup}>
             <label>Check-Out Date *</label>
             <input
@@ -167,7 +161,6 @@ export default function CheckOutPage() {
               required
             />
           </div>
-
           <div className={styles.formGroup}>
             <label>Check-Out Time *</label>
             <input
@@ -178,7 +171,6 @@ export default function CheckOutPage() {
               required
             />
           </div>
-
           <div className={styles.formGroup}>
             <label>Rate Per Day (Override)</label>
             <input
@@ -192,7 +184,6 @@ export default function CheckOutPage() {
             />
             <small>Leave empty to use original parking rate</small>
           </div>
-
           {calculated.totalDays > 0 && (
             <div className={styles.calculation}>
               <div className={styles.calcRow}>
@@ -205,7 +196,6 @@ export default function CheckOutPage() {
               </div>
             </div>
           )}
-
           <button type="submit" className={styles.submitBtn} disabled={loading || fetching}>
             {loading ? 'Processing...' : 'Check-Out Vehicle'}
           </button>
