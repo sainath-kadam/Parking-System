@@ -1,0 +1,83 @@
+# ============================
+# Node.js
+# ============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================
+# Environment variables
+# ============================
+.env
+.env.*
+!.env.example
+
+# ============================
+# Build outputs
+# ============================
+dist/
+build/
+coverage/
+
+# ============================
+# OS / Editor
+# ============================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ============================
+# Logs
+# ============================
+logs/
+*.log
+
+# ============================
+# Runtime data
+# ============================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ============================
+# Mongo / DB dumps
+# ============================
+*.bson
+*.csv
+*.json
+
+# ============================
+# PDF Receipts & Bills (Local)
+# ============================
+receipts/
+bills/
+*.pdf
+
+# ============================
+# Backup exports
+# ============================
+backups/
+exports/
+
+# ============================
+# Google Drive / OAuth
+# ============================
+credentials.json
+token.json
+
+# ============================
+# React
+# ============================
+frontend/node_modules/
+frontend/build/
+
+# ============================
+# Temp files
+# ============================
+tmp/
+temp/
+.cache/
