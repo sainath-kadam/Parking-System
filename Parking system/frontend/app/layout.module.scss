@@ -1,0 +1,152 @@
+.body {
+  margin: 0;
+  font-family: "Inter", "Roboto", sans-serif;
+  background: linear-gradient(180deg, #f7fafc 0%, #eef2f7 100%);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.brand {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.logo {
+  flex-shrink: 0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  color: #475569;
+  line-height: 1;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+}
+
+.hamburger {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.hamburger:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.25);
+}
+
+.hamburgerLine,
+.hamburgerLineOpen {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #0f172a;
+  border-radius: 2px;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+
+.hamburgerLineOpen {
+  background: #0f172a;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navList li {
+  display: inline;
+}
+
+.navLink {
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.navLink:hover {
+  background: rgba(14, 165, 233, 0.08);
+  transform: translateY(-2px);
+}
+
+.main {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Responsive: collapse nav into hamburger on small screens */
+@media (max-width: 800px) {
+  .navList {
+    position: absolute;
+    top: 72px;
+    right: 16px;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid rgba(2, 6, 23, 0.06);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    padding: 0.75rem;
+    border-radius: 10px;
+    display: none;
+    min-width: 160px;
+  }
+
+  .navList.open {
+    display: flex;
+  }
+
+  .hamburgerLine {
+    background: #0f172a;
+  }
+
+  .hamburgerLineOpen:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .hamburgerLineOpen:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburgerLineOpen:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+}
+
+/* Larger screens: hide hamburger */
+@media (min-width: 801px) {
+  .hamburger {
+    display: none;
+  }
+}
