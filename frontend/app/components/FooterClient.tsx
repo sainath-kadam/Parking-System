@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import styles from "../layout.module.scss";
 
 export default function FooterClient() {

@@ -1,13 +1,11 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { checkIn, getVehicleByNumber } from "@/services/api";
 import styles from "./page.module.scss";
 
 export default function CheckInPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const prefillNumber = searchParams.get("vehicleNumber") || "";
 
@@ -104,8 +102,6 @@ export default function CheckInPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        
-
         {successData ? (
           <div className={styles.successBox}>
             <h2>Checked in successfully</h2>
@@ -143,7 +139,6 @@ export default function CheckInPage() {
                 <span className={styles.searchIndicator}>🔍 Searching...</span>
               )}
             </div>
-
             <div className={styles.formGroup}>
               <label>Owner Name *</label>
               <input
@@ -155,7 +150,6 @@ export default function CheckInPage() {
                 required
               />
             </div>
-
             <div className={styles.formGroup}>
               <label>Owner Mobile *</label>
               <input
@@ -168,7 +162,6 @@ export default function CheckInPage() {
                 pattern="[0-9]{10}"
               />
             </div>
-
             <div className={styles.formGroup}>
               <label>Driver Name</label>
               <input
@@ -179,7 +172,6 @@ export default function CheckInPage() {
                 placeholder="Enter driver name (optional)"
               />
             </div>
-
             <div className={styles.formGroup}>
               <label>Driver Mobile</label>
               <input
@@ -191,7 +183,6 @@ export default function CheckInPage() {
                 pattern="[0-9]{10}"
               />
             </div>
-
             <div className={styles.formGroup}>
               <label>Vehicle Type *</label>
               <select
@@ -207,7 +198,6 @@ export default function CheckInPage() {
                 <option value="Other">Other</option>
               </select>
             </div>
-
             <div className={styles.formGroup}>
               <label>Parking Rate (per day) *</label>
               <input
@@ -221,7 +211,6 @@ export default function CheckInPage() {
                 step="0.01"
               />
             </div>
-
             <button
               type="submit"
               className={styles.submitBtn}

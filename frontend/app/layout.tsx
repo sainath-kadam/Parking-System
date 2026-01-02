@@ -1,4 +1,3 @@
-import Link from "next/link";
 import styles from "./layout.module.scss";
 import HeaderClient from "./components/HeaderClient";
 import FooterClient from "./components/FooterClient";

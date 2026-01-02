@@ -1,11 +1,8 @@
-// Modern Parking Landing Page Styles
-
 .landingPage {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   position: relative;
   overflow-x: hidden;
-  
   &::before {
     content: '';
     position: absolute;

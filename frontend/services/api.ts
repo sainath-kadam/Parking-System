@@ -62,8 +62,6 @@ export const getStats = async () => {
 };
 
 export const getParkingByToken = async (tokenId: string) => {
-  // This endpoint needs to be created in backend
-  // For now, we'll use a workaround
   const response = await api.get(`/parking/token/${tokenId}`);
   return response.data;
 };
