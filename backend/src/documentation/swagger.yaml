@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Parking Management API
+  description: |
+    Minimal, auditable parking management backend.
+    Flat-rate pricing, manual operator input.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api
+    description: Local
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Owner:
+      type: object
+      properties:
+        name:
+          type: string
+        mobile:
+          type: string
+
+    Driver:
+      type: object
+      properties:
+        name:
+          type: string
+        mobile:
+          type: string
+
+    CheckInRequest:
+      type: object
+      required:
+        - vehicleNumber
+        - vehicleType
+        - ratePerHour
+        - owner
+        - driver
+      properties:
+        vehicleNumber:
+          type: string
+        vehicleType:
+          type: string
+        ratePerHour:
+          type: number
+        graceMinutes:
+          type: number
+        owner:
+          $ref: '#/components/schemas/Owner'
+        driver:
+          $ref: '#/components/schemas/Driver'
+
+    CheckOutRequest:
+      type: object
+      required:
+        - vehicleNumber
+      properties:
+        vehicleNumber:
+          type: string
+        driver:
+          $ref: '#/components/schemas/Driver'
+
+paths:
+
+  /auth/login:
+    post:
+      summary: Login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login success
+
+  /parking/check-in:
+    post:
+      summary: Vehicle Check-In
+      tags: [Parking]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckInRequest'
+      responses:
+        201:
+          description: Vehicle checked in
+        400:
+          description: Validation / business error
+
+  /parking/check-out:
+    post:
+      summary: Vehicle Check-Out
+      tags: [Parking]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckOutRequest'
+      responses:
+        200:
+          description: Vehicle checked out
+
+  /parking/active:
+    get:
+      summary: Get parking list (IN / OUT)
+      tags: [Parking]
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Parking list
+
+  /dashboard:
+    get:
+      summary: Dashboard statistics
+      tags: [Dashboard]
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Dashboard data
+
+  /settings:
+    get:
+      summary: Get system settings
+      tags: [Settings]
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Settings
+
+    put:
+      summary: Update system settings (SYSTEM_OWNER)
+      tags: [Settings]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: Updated settings
+
+  /audit:
+    get:
+      summary: Get audit logs
+      tags: [Audit]
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Audit logs
