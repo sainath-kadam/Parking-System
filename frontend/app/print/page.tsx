@@ -21,8 +21,6 @@ export default function PrintPage() {
 
   const fetchParkingData = async () => {
     try {
-      // Note: You'll need to create this API endpoint
-      // For now, we'll use a mock structure
       const response = await getParkingByToken(tokenId!);
       if (response.success) {
         setParkingData(response.data);

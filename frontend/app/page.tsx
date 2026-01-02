@@ -5,7 +5,6 @@ import styles from "./page.module.scss";
 export default function LandingPage() {
   return (
     <div className={styles.landingPage}>
-      {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
@@ -19,7 +18,6 @@ export default function LandingPage() {
               Experience the future of parking management with instant check-in/check-out,
               real-time availability tracking, and seamless digital receipts. Fast, secure, and intelligent.
             </p>
-
             <div className={styles.heroActions}>
               <Link href="/check-in" className={styles.primaryCta}>
                 <span>Start Check-In</span>
@@ -29,7 +27,6 @@ export default function LandingPage() {
                 View Dashboard
               </Link>
             </div>
-
             <div className={styles.stats}>
               <div className={styles.statItem}>
                 <div className={styles.statValue}>10,000+</div>
@@ -45,7 +42,6 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-
           <div className={styles.heroVisual}>
             <div className={styles.imageCard}>
               <Image
@@ -67,8 +63,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Quick Actions */}
       <section className={styles.quickActions}>
         <Link href="/check-in" className={styles.actionCard}>
           <div className={styles.actionIcon}>🚀</div>
@@ -85,10 +79,7 @@ export default function LandingPage() {
           <h3 className={styles.actionTitle}>Check-Out</h3>
           <p className={styles.actionDesc}>Fast exit process</p>
         </Link>
-
-
       </section>
-
       {/* Features Section */}
       <section className={styles.features}>
         <div className={styles.sectionHeader}>
@@ -97,7 +88,6 @@ export default function LandingPage() {
             Advanced features designed for modern convenience
           </p>
         </div>
-
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>⚡</div>
@@ -115,7 +105,6 @@ export default function LandingPage() {
               />
             </div>
           </div>
-
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>📊</div>
             <h4 className={styles.featureTitle}>Real-Time Analytics</h4>
@@ -132,7 +121,6 @@ export default function LandingPage() {
               />
             </div>
           </div>
-
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>🖨️</div>
             <h4 className={styles.featureTitle}>Digital Receipts</h4>
@@ -149,7 +137,6 @@ export default function LandingPage() {
               />
             </div>
           </div>
-
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>🔒</div>
             <h4 className={styles.featureTitle}>Secure & Protected</h4>
@@ -168,8 +155,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className={styles.ctaContent}>
           <h3 className={styles.ctaTitle}>Ready to Experience Smart Parking?</h3>
