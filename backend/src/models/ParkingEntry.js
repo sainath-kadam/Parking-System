@@ -23,11 +23,19 @@ const parkingEntrySchema = new mongoose.Schema(
       required: true
     },
     */
-   ratePerHour: {
-    type: Number
+    ratePerHour: {
+        type: Number
    },
-   calculatedAmount: {
-    type: Number,
+    calculatedAmount: {
+        type: Number,
+    },
+    finalAmount: {
+        type: Number
+    },
+
+    discountAmount: {
+        type: Number,
+        default: 0
     },  
     operatorId: {
       type: mongoose.Schema.Types.ObjectId,
