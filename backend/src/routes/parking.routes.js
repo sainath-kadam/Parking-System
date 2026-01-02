@@ -1,17 +1,9 @@
-import express from 'express';
-import authMiddleware from '../middlewares/auth.middleware.js';
-import {
-  checkInVehicle,
-  checkOutVehicle,
-  getActiveParkingList
-} from '../controllers/parking.controller.js';
-
-const router = express.Router();
-
-router.use(authMiddleware);
+import { checkInVehicle } from '../controllers/checkin.controller.js';
+import { checkOutVehicle } from '../controllers/checkout.controller.js';
+import { getParkingList } from '../controllers/parkingList.controller.js';
 
 router.post('/check-in', checkInVehicle);
 router.post('/check-out', checkOutVehicle);
-router.get('/active', getActiveParkingList);
+router.get('/active', getParkingList);
 
 export default router;
