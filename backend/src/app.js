@@ -13,8 +13,8 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-const swaggerDocument = YAML.load('./documentation/swagger.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//const swaggerDocument = YAML.load('./documentation/swagger.yaml');
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(errorMiddleware);
 
