@@ -27,9 +27,9 @@ export default function CheckOutPage() {
   const fetchActiveEntry = async (vehicleNumber?: string, tokenId?: string) => {
     const vNumber = vehicleNumber || formData.vehicleNumber;
     const tId = tokenId || formData.tokenId;
-    
+
     if (!vNumber && !tId) return;
-    
+
     setFetching(true);
     try {
       const response = await getActiveEntry(vNumber || undefined, tId || undefined);
@@ -68,14 +68,14 @@ export default function CheckOutPage() {
 
     const checkIn = new Date(entryData.checkInDate);
     const checkOut = new Date(formData.checkOutDate);
-    
+
     checkIn.setHours(0, 0, 0, 0);
     checkOut.setHours(0, 0, 0, 0);
-    
+
     const diffTime = checkOut.getTime() - checkIn.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const totalDays = Math.max(1, diffDays);
-    
+
     const rate = parseFloat(formData.ratePerDay) || entryData.ratePerDay || 0;
     const totalAmount = totalDays * rate;
 
@@ -107,7 +107,7 @@ export default function CheckOutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.vehicleNumber && !formData.tokenId) {
       alert('Please enter vehicle number or token ID');
       return;
@@ -119,7 +119,7 @@ export default function CheckOutPage() {
         ...formData,
         ratePerDay: formData.ratePerDay || undefined
       });
-      
+
       if (response.success) {
         router.push(`/print?tokenId=${response.data.tokenId}&checkout=true`);
       }
@@ -132,11 +132,9 @@ export default function CheckOutPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <Link href="/" className={styles.backBtn}>← Back</Link>
-          <h1>Vehicle Check-Out</h1>
-        </div>
+      <div className={styles.card}>
+
+    
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>

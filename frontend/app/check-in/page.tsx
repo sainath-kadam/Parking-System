@@ -103,13 +103,8 @@ export default function CheckInPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <Link href="/" className={styles.backBtn}>
-            ← Back
-          </Link>
-          <h1>Vehicle Check-In</h1>
-        </div>
+      <div className={styles.card}>
+        
 
         {successData ? (
           <div className={styles.successBox}>

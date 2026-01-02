@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./layout.module.scss";
 import HeaderClient from "./components/HeaderClient";
+import FooterClient from "./components/FooterClient";
 
 export const metadata = {
   title: "Sachin Parking System",
@@ -16,8 +17,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={styles.body}>
         <HeaderClient />
-
         <main className={styles.main}>{children}</main>
+        <FooterClient />
       </body>
     </html>
   );

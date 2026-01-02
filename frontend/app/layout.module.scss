@@ -7,105 +7,163 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* HEADER – Dark Glass Style */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 .brand {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover .brandName {
+    color: #06b6d4;
+  }
 }
 
-.logo {
-  flex-shrink: 0;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
+
+.headerContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.title {
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+}
+
+.brandName {
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 900;
+  // background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+  color: #ffffff;
+  // -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.subtitle {
+.brandTagline {
   font-size: 0.75rem;
-  color: #475569;
-  line-height: 1;
+  color: white;
 }
 
+/* Navigation */
 .nav {
   display: flex;
   align-items: center;
 }
 
-.hamburger {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.hamburger:focus {
-  outline: 2px solid rgba(14, 165, 233, 0.25);
-}
-
-.hamburgerLine,
-.hamburgerLineOpen {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: #0f172a;
-  border-radius: 2px;
-  transition: transform 200ms ease, opacity 200ms ease;
-}
-
-.hamburgerLineOpen {
-  background: #0f172a;
-}
-
 .navList {
   list-style: none;
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   margin: 0;
   padding: 0;
+
+  li a {
+    color: #e2e8f0;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #06b6d4;
+      background: rgba(6, 182, 212, 0.12);
+      transform: translateY(-2px);
+    }
+  }
 }
 
-.navList li {
-  display: inline;
+/* Hamburger */
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
 }
 
-.navLink {
-  color: #0f172a;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  transition: background-color 160ms ease, transform 160ms ease;
+.line,
+.lineOpen {
+  width: 24px;
+  height: 2px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  display: block;
 }
 
-.navLink:hover {
-  background: rgba(14, 165, 233, 0.08);
-  transform: translateY(-2px);
+.lineOpen:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
 }
+.lineOpen:nth-child(2) {
+  opacity: 0;
+}
+.lineOpen:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .navList {
+    position: absolute;
+    top: 72px;
+    right: 1.5rem;
+    flex-direction: column;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    display: none;
+    gap: 1rem;
+  }
+
+  .navList.open {
+    display: flex;
+  }
+}
+
 
 .main {
-  padding: 2rem;
-  max-width: 1100px;
+  padding: 1rem;
   margin: 0 auto;
+  border-radius: 100px;
 }
 
 /* Responsive: collapse nav into hamburger on small screens */
@@ -148,5 +206,113 @@
 @media (min-width: 801px) {
   .hamburger {
     display: none;
+  }
+}
+
+
+// Add these styles to your existing layout.module.scss file
+
+// Footer Styles
+.footer {
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3rem 2rem 1.5rem;
+  color: #e2e8f0;
+  margin: 20px;
+}
+
+.footerContent {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.footerBrand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footerLogo {
+  flex-shrink: 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
+}
+
+.footerBrandName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.footerTagline {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.footerLinks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.footerColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  
+  a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      color: #0ea5e9;
+      transform: translateX(3px);
+    }
+  }
+}
+
+.footerHeading {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.footerAddress {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footerBottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-top: 1.5rem;
+  text-align: center;
+  
+  p {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin: 0;
   }
 }

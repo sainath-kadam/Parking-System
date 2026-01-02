@@ -50,14 +50,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.header}>
+    <main className={styles.page}>
+      <section className={styles.container}>
+        <header className={styles.header}>
           <h1>Register Vehicle</h1>
           <p className={styles.lead}>
             Add a vehicle to speed up future check-ins.
           </p>
-        </div>
+        </header>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             {loading ? "Registering..." : "Register Vehicle"}
           </button>
         </form>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

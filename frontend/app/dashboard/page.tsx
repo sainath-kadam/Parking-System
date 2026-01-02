@@ -1,143 +1,136 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { getStats, getActiveParkings } from '@/services/api';
+import { useEffect, useState } from 'react';
 import styles from './page.module.scss';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  LineChart, Line
+} from 'recharts';
+
+type Filter = 'today' | 'week' | 'month';
+type Tab = 'IN' | 'OUT';
 
 export default function DashboardPage() {
+  const [filter, setFilter] = useState<Filter>('today');
+  const [tab, setTab] = useState<Tab>('IN');
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    todayEntries: 0,
-    currentlyParked: 0,
-    todayEarnings: 0,
-    monthEarnings: 0
-  });
-  const [activeParkings, setActiveParkings] = useState<any[]>([]);
+
+  const [stats, setStats] = useState<any>(null);
+  const [revenueChart, setRevenueChart] = useState<any[]>([]);
+  const [peakChart, setPeakChart] = useState<any[]>([]);
+  const [parkings, setParkings] = useState<any>({ IN: [], OUT: [] });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchDashboard();
+  }, [filter]);
 
-  const fetchData = async () => {
+  const fetchDashboard = async () => {
+    setLoading(true);
     try {
-      const [statsRes, activeRes] = await Promise.all([
-        getStats(),
-        getActiveParkings()
-      ]);
-      
-      if (statsRes.success) {
-        setStats(statsRes.data);
-      }
-      
-      if (activeRes.success) {
-        setActiveParkings(activeRes.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
+      const res = await fetch(`/api/dashboard?filter=${filter}`);
+      const data = await res.json();
+
+      setStats(data.stats);
+      setRevenueChart(data.revenueChart);
+      setPeakChart(data.peakChart);
+      setParkings(data.parkings);
+    } catch (err) {
+      console.error('Dashboard error', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  };
-
-  const formatTime = (time: string) => {
-    return time;
-  };
-
-  if (loading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.loading}>Loading...</div>
-      </div>
-    );
-  }
+  if (loading) return <div className={styles.loading}>Loading dashboard…</div>;
 
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-        <div className={styles.header}>
-          <Link href="/" className={styles.backBtn}>← Back</Link>
-          <h1>Dashboard</h1>
+
+        {/* Filters */}
+        <div className={styles.filters}>
+          {['today', 'week', 'month'].map(f => (
+            <button
+              key={f}
+              className={filter === f ? styles.active : ''}
+              onClick={() => setFilter(f as Filter)}
+            >
+              {f.toUpperCase()}
+            </button>
+          ))}
         </div>
 
+        {/* Stats */}
         <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>📥</div>
-            <div className={styles.statContent}>
-              <h3>Today's Entries</h3>
-              <p className={styles.statValue}>{stats.todayEntries}</p>
-            </div>
+          <Card title="Currently Parked" value={stats?.currentlyParked} />
+          <Card title="Checked Out Today" value={stats?.checkedOutToday} />
+          <Card title="Today Revenue" value={`₹${stats?.todayRevenue}`} />
+          <Card title="Avg Duration" value={`${stats?.avgDuration} hrs`} />
+          <Card title="Peak Hours" value={stats?.peakHour} />
+        </div>
+
+        {/* Charts */}
+        <div className={styles.charts}>
+          <div className={styles.chartCard}>
+            <h3>Revenue Trend</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={revenueChart}>
+                <XAxis dataKey="label" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>🚗</div>
-            <div className={styles.statContent}>
-              <h3>Currently Parked</h3>
-              <p className={styles.statValue}>{stats.currentlyParked}</p>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>💰</div>
-            <div className={styles.statContent}>
-              <h3>Today's Earnings</h3>
-              <p className={styles.statValue}>{formatCurrency(stats.todayEarnings)}</p>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>📊</div>
-            <div className={styles.statContent}>
-              <h3>Monthly Earnings</h3>
-              <p className={styles.statValue}>{formatCurrency(stats.monthEarnings)}</p>
-            </div>
+          <div className={styles.chartCard}>
+            <h3>Peak Parking Hours</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={peakChart}>
+                <XAxis dataKey="hour" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="count" stroke="#06b6d4" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className={styles.activeSection}>
-          <h2>Currently Parked Vehicles</h2>
-          {activeParkings.length === 0 ? (
-            <div className={styles.empty}>No vehicles currently parked</div>
-          ) : (
-            <div className={styles.table}>
-              <div className={styles.tableHeader}>
-                <div>Token</div>
-                <div>Vehicle</div>
-                <div>Check-In</div>
-                <div>Rate/Day</div>
-              </div>
-              {activeParkings.map((parking) => (
-                <div key={parking._id} className={styles.tableRow}>
-                  <div className={styles.token}>{parking.tokenId}</div>
-                  <div className={styles.vehicle}>{parking.vehicleNumber}</div>
-                  <div>
-                    <div>{formatDate(parking.checkInDate)}</div>
-                    <div className={styles.time}>{formatTime(parking.checkInTime)}</div>
-                  </div>
-                  <div>₹{parking.ratePerDay}</div>
-                </div>
-              ))}
-            </div>
-          )}
+        {/* Tabs */}
+        <div className={styles.tabs}>
+          <button onClick={() => setTab('IN')} className={tab === 'IN' ? styles.active : ''}>IN</button>
+          <button onClick={() => setTab('OUT')} className={tab === 'OUT' ? styles.active : ''}>OUT</button>
         </div>
+
+        {/* Table */}
+        <div className={styles.table}>
+          <div className={styles.tableHeader}>
+            <div>Token</div>
+            <div>Vehicle</div>
+            <div>Date</div>
+            <div>Amount</div>
+          </div>
+
+          {parkings[tab].map((p: any) => (
+            <div key={p._id} className={styles.tableRow}>
+              <div>{p.tokenId}</div>
+              <div>{p.vehicleNumber}</div>
+              <div>{p.date}</div>
+              <div>₹{p.amount}</div>
+            </div>
+          ))}
+        </div>
+
       </div>
     </div>
   );
 }
 
+function Card({ title, value }: any) {
+  return (
+    <div className={styles.statCard}>
+      <h4>{title}</h4>
+      <p>{value}</p>
+    </div>
+  );
+}
