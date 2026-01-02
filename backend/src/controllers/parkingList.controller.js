@@ -1,4 +1,7 @@
 import ParkingEntry from '../models/ParkingEntry.js';
+import Vehicle from '../models/Vehicle.js';
+import Driver from '../models/Driver.js';
+import Owner from '../models/Owner.js';
 
 export async function getParkingList(req, res) {
   try {
@@ -6,6 +9,9 @@ export async function getParkingList(req, res) {
       filter = 'all',
       from,
       to,
+      vehicleNumber,
+      driverMobile,
+      ownerMobile,
       page = 1
     } = req.query;
 
@@ -13,23 +19,47 @@ export async function getParkingList(req, res) {
     const skip = (Number(page) - 1) * limit;
 
     const query = {};
-
     const now = new Date();
     let startDate;
     let endDate = now;
 
-    if (filter === 'today') startDate = new Date(now.setHours(0, 0, 0, 0));
-    if (filter === 'week') startDate = new Date(now.setDate(now.getDate() - now.getDay()));
+    if (filter === 'today') startDate = new Date(new Date().setHours(0, 0, 0, 0));
+    if (filter === 'week') startDate = new Date(new Date().setDate(new Date().getDate() - new Date().getDay()));
     if (filter === 'month') startDate = new Date(now.getFullYear(), now.getMonth(), 1);
     if (filter === 'custom') {
-      if (!from || !to) return res.status(400).json({ message: 'from and to dates are required for custom filter' });
+      if (!from || !to) return res.status(400).json({ message: 'from and to are required for custom filter' });
       startDate = new Date(from);
       endDate = new Date(to);
     }
 
     if (startDate) query.inTime = { $gte: startDate, $lte: endDate };
 
-    const list = await ParkingEntry.find(query)
+    if (vehicleNumber) {
+      const vehicle = await Vehicle.findOne({ vehicleNumber });
+      if (!vehicle) return res.json({ data: [], pagination: { page: Number(page), limit, total: 0, hasMore: false } });
+      query.vehicleId = vehicle._id;
+    }
+
+    if (driverMobile || ownerMobile) {
+      const assignmentMatch = {};
+
+      if (driverMobile) {
+        const driver = await Driver.findOne({ mobile: driverMobile });
+        if (!driver) return res.json({ data: [], pagination: { page: Number(page), limit, total: 0, hasMore: false } });
+        assignmentMatch.driverId = driver._id;
+      }
+
+      if (ownerMobile) {
+        const owner = await Owner.findOne({ mobile: ownerMobile });
+        if (!owner) return res.json({ data: [], pagination: { page: Number(page), limit, total: 0, hasMore: false } });
+        assignmentMatch.ownerId = owner._id;
+      }
+
+      const assignmentIds = await ParkingEntry.distinct('assignmentId', assignmentMatch);
+      query.assignmentId = { $in: assignmentIds };
+    }
+
+    const data = await ParkingEntry.find(query)
       .populate('vehicleId')
       .populate('assignmentId')
       .sort({ inTime: -1 })
@@ -39,15 +69,15 @@ export async function getParkingList(req, res) {
     const total = await ParkingEntry.countDocuments(query);
 
     res.json({
-      data: list,
+      data,
       pagination: {
         page: Number(page),
         limit,
         total,
-        hasMore: skip + list.length < total
+        hasMore: skip + data.length < total
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch parking list' });
+    res.status(500).json({ message: 'Failed to fetch parking records' });
   }
 }

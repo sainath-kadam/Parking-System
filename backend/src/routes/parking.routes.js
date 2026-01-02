@@ -4,6 +4,6 @@ import { getParkingList } from '../controllers/parkingList.controller.js';
 
 router.post('/check-in',validate(checkInSchema), checkInVehicle);
 router.post('/check-out', validate(checkOutSchema), checkOutVehicle);
-router.get('/active', getParkingList);
+router.get('/list', getParkingList);
 
 export default router;
