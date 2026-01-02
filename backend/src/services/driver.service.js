@@ -1,15 +1,16 @@
 import Driver from '../models/Driver.js';
 
-export async function upsertDriver({ name, mobile }) {
-  let driver = await Driver.findOne({ mobile });
+export async function upsertDriver({ name, mobile }, session) {
+  let driver = await Driver.findOne({ mobile }).session(session);
 
   if (driver) {
     if (driver.name !== name) {
       driver.name = name;
-      await driver.save();
+      await driver.save({ session });
     }
     return driver;
   }
 
-  return Driver.create({ name, mobile });
+  const [created] = await Driver.create([{ name, mobile }], { session });
+  return created;
 }

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import ParkingEntry from '../models/ParkingEntry.js';
 import { PARKING_STATUS } from '../utils/constants.js';
 
@@ -10,44 +11,44 @@ import { checkOutParkingEntry } from '../services/parking.service.js';
 import { logAudit } from '../services/audit.service.js';
 
 export async function checkOutVehicle(req, res) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { vehicleNumber, driver } = req.body;
 
     const entry = await ParkingEntry.findOne({
       status: PARKING_STATUS.IN
-    }).populate('assignmentId');
+    }).populate('assignmentId').session(session);
 
-    if (!entry) {
-      return res.status(404).json({ message: 'Active parking entry not found' });
-    }
+    if (!entry) throw new Error('Active parking not found');
 
     const assignment = entry.assignmentId;
 
-    // 🔁 Driver reassignment logic
     if (driver) {
-      const updatedDriver = await upsertDriver(driver);
+      const updatedDriver = await upsertDriver(driver, session);
 
       if (updatedDriver._id.toString() !== assignment.driverId.toString()) {
-        await closeAssignment(assignment);
+        await closeAssignment(assignment, session);
 
-        const newAssignment = await createAssignment({
+        const newAssign = await createAssignment({
           vehicleId: assignment.vehicleId,
           ownerId: assignment.ownerId,
           driverId: updatedDriver._id
-        });
+        }, session);
 
-        entry.assignmentId = newAssignment._id;
+        entry.assignmentId = newAssign._id;
 
         await logAudit({
           entity: 'VehicleAssignment',
-          entityId: newAssignment._id,
+          entityId: newAssign._id,
           action: 'DRIVER_REASSIGNED_AT_CHECKOUT',
           performedBy: req.user.userId
-        });
+        }, session);
       }
     }
 
-    const updatedEntry = await checkOutParkingEntry({
+    const updated = await checkOutParkingEntry({
       parkingEntry: entry,
       ratePerHour: entry.ratePerHour,
       graceMinutes: entry.graceMinutes
@@ -55,15 +56,17 @@ export async function checkOutVehicle(req, res) {
 
     await logAudit({
       entity: 'ParkingEntry',
-      entityId: updatedEntry._id,
+      entityId: updated._id,
       action: 'CHECK_OUT',
-      oldValue: { status: PARKING_STATUS.IN },
-      newValue: updatedEntry,
       performedBy: req.user.userId
-    });
+    }, session);
 
-    res.json(updatedEntry);
+    await session.commitTransaction();
+    res.json(updated);
   } catch (err) {
-    res.status(500).json({ message: 'Check-out failed' });
+    await session.abortTransaction();
+    res.status(400).json({ message: err.message });
+  } finally {
+    session.endSession();
   }
 }

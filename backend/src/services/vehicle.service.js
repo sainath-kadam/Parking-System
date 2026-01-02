@@ -1,12 +1,15 @@
 import Vehicle from '../models/Vehicle.js';
 
-export async function getOrCreateVehicle({ vehicleNumber, vehicleType }) {
-  let vehicle = await Vehicle.findOne({ vehicleNumber });
-
+export async function getOrCreateVehicle(
+  { vehicleNumber, vehicleType },
+  session
+) {
+  let vehicle = await Vehicle.findOne({ vehicleNumber }).session(session);
   if (vehicle) return vehicle;
 
-  return Vehicle.create({
-    vehicleNumber,
-    vehicleType
-  });
+  const [created] = await Vehicle.create(
+    [{ vehicleNumber, vehicleType }],
+    { session }
+  );
+  return created;
 }

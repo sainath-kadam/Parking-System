@@ -26,12 +26,13 @@ export async function checkInVehicle(req, res) {
       graceMinutes = 0
     } = req.body;
 
-    const vehicle = await getOrCreateVehicle({ vehicleNumber, vehicleType }, session);
+    const vehicle = await getOrCreateVehicle(
+      { vehicleNumber, vehicleType },
+      session
+    );
 
-    const existingAssignment = await getActiveAssignment(vehicle._id, session);
-    if (existingAssignment) {
-      throw new Error('Vehicle already parked');
-    }
+    const existing = await getActiveAssignment(vehicle._id, session);
+    if (existing) throw new Error('Vehicle already parked');
 
     const ownerDoc = await upsertOwner(owner, session);
     const driverDoc = await upsertDriver(driver, session);
@@ -42,7 +43,7 @@ export async function checkInVehicle(req, res) {
       driverId: driverDoc._id
     }, session);
 
-    const entry = await ParkingEntry.create([{
+    const [entry] = await ParkingEntry.create([{
       vehicleId: vehicle._id,
       assignmentId: assignment._id,
       inTime: getISTNow(),
@@ -54,20 +55,18 @@ export async function checkInVehicle(req, res) {
 
     await logAudit({
       entity: 'ParkingEntry',
-      entityId: entry[0]._id,
+      entityId: entry._id,
       action: 'CHECK_IN',
-      newValue: entry[0],
+      newValue: entry,
       performedBy: req.user.userId
     }, session);
 
     await session.commitTransaction();
-    session.endSession();
-
-    res.status(201).json(entry[0]);
-
+    res.status(201).json(entry);
   } catch (err) {
     await session.abortTransaction();
-    session.endSession();
     res.status(400).json({ message: err.message });
+  } finally {
+    session.endSession();
   }
 }

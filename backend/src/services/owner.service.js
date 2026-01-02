@@ -1,15 +1,13 @@
-import Owner from '../models/Owner.js';
-
-export async function upsertOwner({ name, mobile }) {
-  let owner = await Owner.findOne({ mobile });
+export async function upsertOwner({ name, mobile }, session) {
+  let owner = await Owner.findOne({ mobile }).session(session);
 
   if (owner) {
     if (owner.name !== name) {
       owner.name = name;
-      await owner.save();
+      await owner.save({ session });
     }
     return owner;
   }
 
-  return Owner.create({ name, mobile });
+  return Owner.create([{ name, mobile }], { session }).then(r => r[0]);
 }
