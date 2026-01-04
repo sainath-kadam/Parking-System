@@ -32,4 +32,6 @@ const TenantSchema = new mongoose.Schema(
   }
 );
 
+TenantSchema.index({ code: 1 }, { unique: true });
+
 export default mongoose.model('Tenant', TenantSchema);

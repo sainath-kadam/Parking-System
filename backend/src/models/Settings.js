@@ -76,6 +76,8 @@ const settingsSchema = new mongoose.Schema(
   }
 );
 
+settingsSchema.index({ tenantId: 1 }, { unique: true });
+
 /**
  * Enforce SINGLE settings document
  */

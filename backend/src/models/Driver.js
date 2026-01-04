@@ -15,6 +15,6 @@ const driverSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-driverSchema.index({ mobile: 1 }, { unique: true });
+driverSchema.index({ tenantId: 1, mobile: 1 }, { unique: true });
 
 export default mongoose.model('Driver', driverSchema);

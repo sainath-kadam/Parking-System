@@ -20,6 +20,6 @@ const vehicleSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-vehicleSchema.index({ vehicleNumber: 1 }, { unique: true });
+vehicleSchema.index({ tenantId: 1, vehicleNumber: 1 }, { unique: true });
 
 export default mongoose.model('Vehicle', vehicleSchema);

@@ -16,6 +16,6 @@ const ownerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-ownerSchema.index({ mobile: 1 }, { unique: true });
+ownerSchema.index({ tenantId: 1, mobile: 1 }, { unique: true });
 
 export default mongoose.model('Owner', ownerSchema);
