@@ -27,10 +27,93 @@ export async function createTenant(req, res) {
 
 export async function listTenants(req, res) {
   try {
-    const tenants = await Tenant.find().sort({ createdAt: -1 });
+    const tenants = await Tenant.aggregate([
+      {
+        $lookup: {
+          from: 'tenantbillingledgers',
+          localField: '_id',
+          foreignField: 'tenantId',
+          as: 'ledger'
+        }
+      },
+      {
+        $addFields: {
+          totalCharged: {
+            $sum: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$ledger',
+                    as: 'l',
+                    cond: { $eq: ['$$l.type', 'CHARGE'] }
+                  }
+                },
+                as: 'c',
+                in: '$$c.amount'
+              }
+            }
+          },
+          totalPaid: {
+            $sum: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$ledger',
+                    as: 'l',
+                    cond: { $eq: ['$$l.type', 'PAYMENT'] }
+                  }
+                },
+                as: 'p',
+                in: '$$p.amount'
+              }
+            }
+          },
+          totalAdjusted: {
+            $sum: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$ledger',
+                    as: 'l',
+                    cond: { $eq: ['$$l.type', 'ADJUSTMENT'] }
+                  }
+                },
+                as: 'a',
+                in: {
+                  $cond: [
+                    { $eq: ['$$a.direction', 'ADD'] },
+                    '$$a.amount',
+                    { $multiply: ['$$a.amount', -1] }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        $addFields: {
+          duesAmount: {
+            $subtract: [
+              { $add: ['$totalCharged', '$totalAdjusted'] },
+              '$totalPaid'
+            ]
+          }
+        }
+      },
+      {
+        $project: {
+          ledger: 0
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]);
+
     res.json(tenants);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch tenants' });
+    res.status(500).json({ message: 'Failed to fetch tenants with billing' });
   }
 }
 
