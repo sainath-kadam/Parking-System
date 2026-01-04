@@ -13,10 +13,11 @@ import tenantMiddleware from '../middlewares/tenant.middleware.js';
 
 const router = express.Router();
 
+router.use('/auth', authRoutes);
+
 router.use(authMiddleware);
 router.use(tenantMiddleware);
 
-router.use('/auth', authRoutes);
 router.use('/parking', parkingRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/audit', auditRoutes);

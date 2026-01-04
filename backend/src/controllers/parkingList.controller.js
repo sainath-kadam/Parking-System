@@ -15,10 +15,11 @@ export async function getParkingList(req, res) {
       page = 1
     } = req.query;
 
+    const tenantId = req.tenantId;
     const limit = 30;
     const skip = (Number(page) - 1) * limit;
 
-    const query = {};
+    const query = { tenantId };
     const now = new Date();
     let startDate;
     let endDate = now;
@@ -35,27 +36,31 @@ export async function getParkingList(req, res) {
     if (startDate) query.inTime = { $gte: startDate, $lte: endDate };
 
     if (vehicleNumber) {
-      const vehicle = await Vehicle.findOne({ vehicleNumber });
+      const vehicle = await Vehicle.findOne({ tenantId, vehicleNumber });
       if (!vehicle) return res.json({ data: [], pagination: { page: Number(page), limit, total: 0, hasMore: false } });
       query.vehicleId = vehicle._id;
     }
 
     if (driverMobile || ownerMobile) {
-      const assignmentMatch = {};
+      const assignmentMatch = { tenantId };
 
       if (driverMobile) {
-        const driver = await Driver.findOne({ mobile: driverMobile });
+        const driver = await Driver.findOne({ tenantId, mobile: driverMobile });
         if (!driver) return res.json({ data: [], pagination: { page: Number(page), limit, total: 0, hasMore: false } });
         assignmentMatch.driverId = driver._id;
       }
 
       if (ownerMobile) {
-        const owner = await Owner.findOne({ mobile: ownerMobile });
+        const owner = await Owner.findOne({ tenantId, mobile: ownerMobile });
         if (!owner) return res.json({ data: [], pagination: { page: Number(page), limit, total: 0, hasMore: false } });
         assignmentMatch.ownerId = owner._id;
       }
 
-      const assignmentIds = await ParkingEntry.distinct('assignmentId', assignmentMatch);
+      const assignmentIds = await ParkingEntry.distinct(
+        'assignmentId',
+        assignmentMatch
+      );
+
       query.assignmentId = { $in: assignmentIds };
     }
 

@@ -1,14 +1,21 @@
 import Settings from '../models/Settings.js';
 
-export async function getSettings() {
-  return Settings.findOne({ isActive: true });
+export async function getSettings(tenantId) {
+  return Settings.findOne({
+    tenantId,
+    isActive: true
+  });
 }
 
-export async function updateSettings(data, userId) {
-  const settings = await Settings.findOne({ isActive: true });
+export async function updateSettings(tenantId, data, userId) {
+  const settings = await Settings.findOne({
+    tenantId,
+    isActive: true
+  });
 
   if (!settings) {
     return Settings.create({
+      tenantId,
       ...data,
       updatedBy: userId
     });

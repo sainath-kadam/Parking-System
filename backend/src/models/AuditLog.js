@@ -27,4 +27,6 @@ const auditLogSchema = new mongoose.Schema(
   { versionKey: false }
 );
 
+auditLogSchema.index({ tenantId: 1, timestamp: -1 });
+
 export default mongoose.model('AuditLog', auditLogSchema);

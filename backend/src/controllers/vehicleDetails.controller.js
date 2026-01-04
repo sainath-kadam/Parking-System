@@ -6,11 +6,13 @@ import { PARKING_STATUS } from '../utils/constants.js';
 export async function getVehicleDetails(req, res) {
   try {
     const { vehicleNumber } = req.params;
+    const tenantId = req.tenantId;
 
-    const vehicle = await Vehicle.findOne({ vehicleNumber });
+    const vehicle = await Vehicle.findOne({ tenantId, vehicleNumber });
     if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
 
     const activeParking = await ParkingEntry.findOne({
+      tenantId,
       vehicleId: vehicle._id,
       status: PARKING_STATUS.IN
     });
@@ -23,6 +25,7 @@ export async function getVehicleDetails(req, res) {
     }
 
     const assignment = await VehicleAssignment.findOne({
+      tenantId,
       vehicleId: vehicle._id,
       isActive: true
     })

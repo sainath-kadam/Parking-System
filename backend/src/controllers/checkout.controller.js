@@ -6,7 +6,7 @@ import ParkingEntry from '../models/ParkingEntry.js';
 import { PARKING_STATUS } from '../utils/constants.js';
 
 import { upsertDriver } from '../services/driver.service.js';
-import {closeAssignment, createAssignment} from '../services/assignment.service.js';
+import { closeAssignment, createAssignment } from '../services/assignment.service.js';
 
 import { checkOutParkingEntry } from '../services/parking.service.js';
 import { logAudit } from '../services/audit.service.js';
@@ -17,13 +17,13 @@ export async function checkOutVehicle(req, res) {
 
   try {
     const { vehicleNumber, driver, finalAmount } = req.body;
+    const tenantId = req.tenantId;
 
-    // resolve vehicle
-    const vehicle = await Vehicle.findOne({ vehicleNumber }).session(session);
+    const vehicle = await Vehicle.findOne({ vehicleNumber, tenantId }).session(session);
     if (!vehicle) throw new Error('Vehicle not found');
 
-    // fetch active parking entry for this vehicle
     const entry = await ParkingEntry.findOne({
+      tenantId,
       vehicleId: vehicle._id,
       status: PARKING_STATUS.IN
     })
@@ -34,15 +34,21 @@ export async function checkOutVehicle(req, res) {
 
     const assignment = entry.assignmentId;
 
-    // reassign driver if changed
     if (driver) {
-      const updatedDriver = await upsertDriver(driver, session);
+      const updatedDriver = await upsertDriver(
+        { ...driver, tenantId },
+        session
+      );
 
       if (updatedDriver._id.toString() !== assignment.driverId.toString()) {
-        await closeAssignment(assignment, session);
+        await closeAssignment(
+          { assignment, tenantId },
+          session
+        );
 
         const newAssignment = await createAssignment(
           {
+            tenantId,
             vehicleId: assignment.vehicleId,
             ownerId: assignment.ownerId,
             driverId: updatedDriver._id
@@ -54,6 +60,7 @@ export async function checkOutVehicle(req, res) {
 
         await logAudit(
           {
+            tenantId,
             entity: 'VehicleAssignment',
             entityId: newAssignment._id,
             action: 'DRIVER_REASSIGNED_AT_CHECKOUT',
@@ -64,7 +71,6 @@ export async function checkOutVehicle(req, res) {
       }
     }
 
-    // system calculation
     const updatedEntry = await checkOutParkingEntry({
       parkingEntry: entry,
       ratePerHour: entry.ratePerHour,
@@ -72,13 +78,9 @@ export async function checkOutVehicle(req, res) {
     });
 
     const calculatedAmount = updatedEntry.calculatedAmount;
-
-    // operator final amount & discount
     const resolvedFinalAmount = finalAmount !== undefined ? finalAmount : calculatedAmount;
 
-    if (resolvedFinalAmount > calculatedAmount) {
-      throw new Error('Final amount cannot exceed calculated amount');
-    }
+    if (resolvedFinalAmount > calculatedAmount) throw new Error('Final amount cannot exceed calculated amount');
 
     const discountAmount = calculatedAmount - resolvedFinalAmount;
 
@@ -87,10 +89,10 @@ export async function checkOutVehicle(req, res) {
 
     await updatedEntry.save({ session });
 
-    // audit discount if applied
     if (discountAmount > 0) {
       await logAudit(
         {
+          tenantId,
           entity: 'ParkingEntry',
           entityId: updatedEntry._id,
           action: 'DISCOUNT_APPLIED',
@@ -105,9 +107,9 @@ export async function checkOutVehicle(req, res) {
       );
     }
 
-    // audit checkout
     await logAudit(
       {
+        tenantId,
         entity: 'ParkingEntry',
         entityId: updatedEntry._id,
         action: 'CHECK_OUT',

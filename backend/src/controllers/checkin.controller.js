@@ -6,10 +6,7 @@ import { PARKING_STATUS } from '../utils/constants.js';
 import { upsertOwner } from '../services/owner.service.js';
 import { upsertDriver } from '../services/driver.service.js';
 import { getOrCreateVehicle } from '../services/vehicle.service.js';
-import {
-  getActiveAssignment,
-  createAssignment
-} from '../services/assignment.service.js';
+import { getActiveAssignment, createAssignment } from '../services/assignment.service.js';
 import { logAudit } from '../services/audit.service.js';
 
 export async function checkInVehicle(req, res) {
@@ -26,40 +23,66 @@ export async function checkInVehicle(req, res) {
       graceMinutes = 0
     } = req.body;
 
+    const tenantId = req.tenantId;
+
     const vehicle = await getOrCreateVehicle(
-      { vehicleNumber, vehicleType },
+      { vehicleNumber, vehicleType, tenantId },
       session
     );
 
-    const existing = await getActiveAssignment(vehicle._id, session);
+    const existing = await getActiveAssignment(
+      { vehicleId: vehicle._id, tenantId },
+      session
+    );
     if (existing) throw new Error('Vehicle already parked');
 
-    const ownerDoc = await upsertOwner(owner, session);
-    const driverDoc = await upsertDriver(driver, session);
+    const ownerDoc = await upsertOwner(
+      { ...owner, tenantId },
+      session
+    );
 
-    const assignment = await createAssignment({
-      vehicleId: vehicle._id,
-      ownerId: ownerDoc._id,
-      driverId: driverDoc._id
-    }, session);
+    const driverDoc = await upsertDriver(
+      { ...driver, tenantId },
+      session
+    );
 
-    const [entry] = await ParkingEntry.create([{
-      vehicleId: vehicle._id,
-      assignmentId: assignment._id,
-      inTime: getISTNow(),
-      ratePerHour,
-      graceMinutes,
-      operatorId: req.user.userId,
-      status: PARKING_STATUS.IN
-    }], { session });
+    const assignment = await createAssignment(
+      {
+        vehicleId: vehicle._id,
+        ownerId: ownerDoc._id,
+        driverId: driverDoc._id,
+        tenantId
+      },
+      session
+    );
 
-    await logAudit({
-      entity: 'ParkingEntry',
-      entityId: entry._id,
-      action: 'CHECK_IN',
-      newValue: entry,
-      performedBy: req.user.userId
-    }, session);
+    const [entry] = await ParkingEntry.create(
+      [
+        {
+          tenantId,
+          vehicleId: vehicle._id,
+          assignmentId: assignment._id,
+          inTime: getISTNow(),
+          ratePerHour,
+          graceMinutes,
+          operatorId: req.user.userId,
+          status: PARKING_STATUS.IN
+        }
+      ],
+      { session }
+    );
+
+    await logAudit(
+      {
+        tenantId,
+        entity: 'ParkingEntry',
+        entityId: entry._id,
+        action: 'CHECK_IN',
+        newValue: entry,
+        performedBy: req.user.userId
+      },
+      session
+    );
 
     await session.commitTransaction();
     res.status(201).json(entry);

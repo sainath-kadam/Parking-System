@@ -5,9 +5,17 @@ import { ENV } from '../config/env.js';
 
 export async function login(req, res) {
   try {
-    const { password } = req.body;
+    const { mobile, password } = req.body;
 
-    const user = await User.findOne({ isActive: true });
+    if (!mobile || !password) {
+      return res.status(400).json({ message: 'Mobile and password are required' });
+    }
+
+    const user = await User.findOne({
+      mobile,
+      isActive: true
+    });
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

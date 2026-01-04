@@ -3,8 +3,12 @@ import ParkingEntry from '../models/ParkingEntry.js';
 export async function getParkingDetails(req, res) {
   try {
     const { parkingEntryId } = req.params;
+    const tenantId = req.tenantId;
 
-    const entry = await ParkingEntry.findById(parkingEntryId)
+    const entry = await ParkingEntry.findOne({
+      _id: parkingEntryId,
+      tenantId
+    })
       .populate('vehicleId')
       .populate({
         path: 'assignmentId',
