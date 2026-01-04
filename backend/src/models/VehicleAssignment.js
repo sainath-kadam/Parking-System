@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 const vehicleAssignmentSchema = new mongoose.Schema(
   {
@@ -19,7 +20,13 @@ const vehicleAssignmentSchema = new mongoose.Schema(
     },
     assignedFrom: { type: Date, required: true },
     assignedTo: { type: Date },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    tenantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tenant',
+      required: true,
+      index: true
+    } 
   },
   { timestamps: true }
 );

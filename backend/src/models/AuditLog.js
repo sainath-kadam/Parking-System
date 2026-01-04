@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 const auditLogSchema = new mongoose.Schema(
   {
@@ -15,7 +16,13 @@ const auditLogSchema = new mongoose.Schema(
       ref: 'User',
       required: true
     },
-    timestamp: { type: Date, required: true }
+    timestamp: { type: Date, required: true },
+    tenantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tenant',
+      required: true,
+      index: true
+    } 
   },
   { versionKey: false }
 );

@@ -9,7 +9,13 @@ const vehicleSchema = new mongoose.Schema(
       trim: true
     },
     vehicleType: { type: String, required: true },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    tenantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Tenant', 
+      required: true,
+      index: true
+    }
   },
   { timestamps: true }
 );
