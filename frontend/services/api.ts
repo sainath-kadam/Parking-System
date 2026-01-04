@@ -67,3 +67,43 @@ export const getParkingByToken = async (tokenId: string) => {
 };
 
 export default api;
+
+
+export const getAllVehicles = async (params?: {
+  vehicleNumber?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  status?: 'active' | 'completed' | 'all';
+}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.vehicleNumber) {
+      queryParams.append('vehicleNumber', params.vehicleNumber);
+    }
+    if (params?.dateFrom) {
+      queryParams.append('dateFrom', params.dateFrom);
+    }
+    if (params?.dateTo) {
+      queryParams.append('dateTo', params.dateTo);
+    }
+    if (params?.status && params.status !== 'all') {
+      queryParams.append('status', params.status);
+    }
+
+    const response = await fetch(
+      `/api/vehicles?${queryParams.toString()}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
