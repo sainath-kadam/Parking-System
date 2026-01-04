@@ -1,171 +1,102 @@
-import Image from "next/image";
-import Link from "next/link";
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import LoginModal from "./components/LoginModal";
 import styles from "./page.module.scss";
 
-export default function LandingPage() {
+export default function Home() {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn === "true") {
+      router.push("/dashboard");
+    }
+  }, [router]);
+
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    router.push("/dashboard");
+  };
+
   return (
-    <div className={styles.landingPage}>
-      <section className={styles.hero}>
-        <div className={styles.heroOverlay}></div>
-        <div className={styles.heroContent}>
-          <div className={styles.heroText}>
-            <span className={styles.badge}>Premium Parking Solution</span>
-            <h2 className={styles.heroTitle}>
-              Smart Parking
-              <span className={styles.highlight}> Redefined</span>
-            </h2>
-            <p className={styles.heroSubtitle}>
-              Experience the future of parking management with instant check-in/check-out,
-              real-time availability tracking, and seamless digital receipts. Fast, secure, and intelligent.
-            </p>
-            <div className={styles.heroActions}>
-              <Link href="/check-in" className={styles.primaryCta}>
-                <span>Start Check-In</span>
-                <span className={styles.ctaArrow}>→</span>
-              </Link>
-              <Link href="/dashboard" className={styles.secondaryCta}>
-                View Dashboard
-              </Link>
-            </div>
-            <div className={styles.stats}>
-              <div className={styles.statItem}>
-                <div className={styles.statValue}>10,000+</div>
-                <div className={styles.statLabel}>Vehicles Daily</div>
-              </div>
-              <div className={styles.statItem}>
-                <div className={styles.statValue}>99.9%</div>
-                <div className={styles.statLabel}>Uptime</div>
-              </div>
-              <div className={styles.statItem}>
-                <div className={styles.statValue}>&lt;30s</div>
-                <div className={styles.statLabel}>Avg Check-in</div>
-              </div>
-            </div>
+    <div className={styles.homePage}>
+      {/* Animated Background */}
+      <div className={styles.animatedBg}>
+        <div className={styles.road}>
+          <div className={styles.roadLine}></div>
+          <div className={styles.roadLine}></div>
+          <div className={styles.roadLine}></div>
+          <div className={styles.roadLine}></div>
+        </div>
+
+        {/* Animated Cars */}
+        <div className={styles.car1}>🚗</div>
+        <div className={styles.car2}>🚙</div>
+        <div className={styles.car3}>🚕</div>
+        <div className={styles.car4}>🚐</div>
+        <div className={styles.car5}>🏎️</div>
+
+        {/* Parking Spots Animation */}
+        <div className={styles.parkingSpots}>
+          <div className={styles.spot}>🅿️</div>
+          <div className={styles.spot}>🅿️</div>
+          <div className={styles.spot}>🅿️</div>
+        </div>
+      </div>
+
+      {/* Hero Content */}
+      <div className={styles.heroContent}>
+        <div className={styles.logoSection}>
+          <div className={styles.logoCircle}>
+            <span className={styles.parkingIcon}>🅿️</span>
           </div>
-          <div className={styles.heroVisual}>
-            <div className={styles.imageCard}>
-              <Image
-                src="/parking-hero.jpg"
-                alt="Modern parking facility"
-                width={600}
-                height={400}
-                className={styles.heroImage}
-                priority
-              />
-              <div className={styles.floatingCard}>
-                <div className={styles.cardIcon}>✓</div>
-                <div>
-                  <div className={styles.cardTitle}>Live Tracking</div>
-                  <div className={styles.cardDesc}>245/300 spots available</div>
-                </div>
-              </div>
-            </div>
+          <h1 className={styles.mainTitle}>Sachin Parking Yard</h1>
+          <p className={styles.tagline}>Professional Parking Management System</p>
+        </div>
+
+        <div className={styles.features}>
+          <div className={styles.feature}>
+            <span className={styles.featureIcon}>⚡</span>
+            <span>Quick Check-In/Out</span>
+          </div>
+          <div className={styles.feature}>
+            <span className={styles.featureIcon}>📊</span>
+            <span>Real-time Dashboard</span>
+          </div>
+          <div className={styles.feature}>
+            <span className={styles.featureIcon}>💰</span>
+            <span>Revenue Tracking</span>
           </div>
         </div>
-      </section>
-      <section className={styles.quickActions}>
-        <Link href="/check-in" className={styles.actionCard}>
-          <div className={styles.actionIcon}>🚀</div>
-          <h3 className={styles.actionTitle}>Check in</h3>
-          <p className={styles.actionDesc}>Fast exit process</p>
-        </Link>
-        <Link href="/register" className={styles.actionCard}>
-          <div className={styles.actionIcon}>🚗</div>
-          <h3 className={styles.actionTitle}>Register</h3>
-          <p className={styles.actionDesc}>Quick vehicle entry</p>
-        </Link>
-        <Link href="/check-out" className={styles.actionCard}>
-          <div className={styles.actionIcon}>🚀</div>
-          <h3 className={styles.actionTitle}>Check-Out</h3>
-          <p className={styles.actionDesc}>Fast exit process</p>
-        </Link>
-      </section>
-      {/* Features Section */}
-      <section className={styles.features}>
-        <div className={styles.sectionHeader}>
-          <h3 className={styles.sectionTitle}>Why Choose Sachin Parking</h3>
-          <p className={styles.sectionSubtitle}>
-            Advanced features designed for modern convenience
-          </p>
-        </div>
-        <div className={styles.featureGrid}>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>⚡</div>
-            <h4 className={styles.featureTitle}>Lightning Fast Entry</h4>
-            <p className={styles.featureDesc}>
-              QR code scanning and automated gate systems get you parked in under 30 seconds.
-            </p>
-            <div className={styles.featureImage}>
-              <Image
-                src="/parking-hero.jpg"
-                alt="Fast entry system"
-                width={300}
-                height={200}
-                className={styles.smallImage}
-              />
-            </div>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>📊</div>
-            <h4 className={styles.featureTitle}>Real-Time Analytics</h4>
-            <p className={styles.featureDesc}>
-              Monitor occupancy, track patterns, and make data-driven decisions with live dashboards.
-            </p>
-            <div className={styles.featureImage}>
-              <Image
-                src="/parking-hero.jpg"
-                alt="Analytics dashboard"
-                width={300}
-                height={200}
-                className={styles.smallImage}
-              />
-            </div>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>🖨️</div>
-            <h4 className={styles.featureTitle}>Digital Receipts</h4>
-            <p className={styles.featureDesc}>
-              Instant printable receipts and automated email confirmations for easy record keeping.
-            </p>
-            <div className={styles.featureImage}>
-              <Image
-                src="/parking-hero.jpg"
-                alt="Digital receipts"
-                width={300}
-                height={200}
-                className={styles.smallImage}
-              />
-            </div>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>🔒</div>
-            <h4 className={styles.featureTitle}>Secure & Protected</h4>
-            <p className={styles.featureDesc}>
-              24/7 CCTV surveillance, encrypted transactions, and secure payment processing.
-            </p>
-            <div className={styles.featureImage}>
-              <Image
-                src="/parking-hero.jpg"
-                alt="Security system"
-                width={300}
-                height={200}
-                className={styles.smallImage}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className={styles.ctaSection}>
-        <div className={styles.ctaContent}>
-          <h3 className={styles.ctaTitle}>Ready to Experience Smart Parking?</h3>
-          <p className={styles.ctaSubtitle}>
-            Join thousands of satisfied customers using Sachin Parking System daily
-          </p>
-          <Link href="/register" className={styles.ctaButton}>
-            Get Started Now
-          </Link>
-        </div>
-      </section>
+
+        <button
+          className={styles.loginButton}
+          onClick={() => setShowLoginModal(true)}
+        >
+          <span className={styles.lockIcon}>🔐</span>
+          Login to Continue
+        </button>
+
+        <p className={styles.infoText}>
+          Login to perform parking activities and manage your parking lot
+        </p>
+      </div>
+
+      {/* Decorative Elements */}
+      <div className={styles.decorCircle1}></div>
+      <div className={styles.decorCircle2}></div>
+      <div className={styles.decorCircle3}></div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)}
+          onSuccess={handleLoginSuccess}
+        />
+      )}
     </div>
   );
 }

@@ -3,14 +3,17 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem;
   background: linear-gradient(135deg, #0f172a, #1e293b);
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 }
 
 /* Glass Card */
 .card {
   width: 100%;
-  max-width: 620px;
+  max-width: 800px;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 24px;
@@ -18,6 +21,11 @@
   padding: 2.5rem;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
   animation: fadeInUp 0.6s ease;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
 }
 
 /* Header */
@@ -26,21 +34,157 @@
   margin-bottom: 2rem;
 
   h1 {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 900;
     color: #ffffff;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: #94a3b8;
+    margin: 0;
+    font-size: 0.95rem;
   }
 }
 
-.backBtn {
-  display: inline-block;
-  margin-bottom: 0.75rem;
+/* ====================== SEARCH SCREEN ====================== */
+
+.searchCard {
+  max-width: 600px !important;
+}
+
+.searchBox {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.vehicleInput {
+  flex: 1;
+  padding: 1.2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+}
+
+.searchBtn {
+  padding: 1.2rem 2rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 50px rgba(34, 197, 94, 0.6);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+}
+
+.helpText {
+  text-align: center;
   color: #94a3b8;
-  text-decoration: none;
+  font-size: 0.9rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Status Badges */
+.existingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.newBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 0.85rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 1.5rem;
 
   &:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: #06b6d4;
+    border-color: rgba(6, 182, 212, 0.3);
   }
 }
 
@@ -49,6 +193,18 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+/* Form Row - 2 Columns */
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .formGroup {
@@ -70,24 +226,47 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: #ffffff;
     font-size: 0.95rem;
-    transition: 0.3s;
+    transition: all 0.3s;
+    box-sizing: border-box;
 
     &:focus {
       outline: none;
       border-color: #06b6d4;
-      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  select {
+    cursor: pointer;
+    
+    option {
+      background: #1e293b;
+      color: #ffffff;
     }
   }
 }
 
-/* Searching */
+/* Disabled Input */
+.disabledInput {
+  background: rgba(255, 255, 255, 0.03) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Searching State */
 .searching {
-  border-color: #06b6d4;
+  border-color: #06b6d4 !important;
+  animation: pulse 1.5s infinite;
 }
 
 .searchIndicator {
   font-size: 0.8rem;
   color: #06b6d4;
+  margin-top: 0.25rem;
   animation: pulse 1.5s infinite;
 }
 
@@ -105,9 +284,13 @@
   transition: all 0.3s ease;
   box-shadow: 0 10px 40px rgba(6, 182, 212, 0.4);
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-3px);
     box-shadow: 0 15px 50px rgba(6, 182, 212, 0.6);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(-1px);
   }
 
   &:disabled {
@@ -116,60 +299,261 @@
   }
 }
 
-/* Success Box */
-.successBox {
-  text-align: center;
-  animation: fadeInDown 0.6s ease;
+/* ====================== RECEIPT MODAL ====================== */
 
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.modalContent {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+  animation: slideUp 0.4s ease;
+}
+
+/* Receipt Design */
+.receipt {
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Courier New', monospace;
+  padding: 1.5rem;
+  border: 2px solid #000000;
+  border-radius: 8px;
+}
+
+.receiptHeader {
+  border-bottom: 2px dashed #000000;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.logoCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.logoText {
   h2 {
-    font-size: 1.8rem;
+    font-size: 1.1rem;
     font-weight: 900;
-    color: #22c55e;
-    margin-bottom: 1rem;
+    margin: 0 0 0.25rem 0;
+    color: #000000;
   }
 
   p {
-    color: #cbd5f5;
-    margin-bottom: 0.4rem;
+    font-size: 0.75rem;
+    margin: 0;
+    color: #555555;
+    line-height: 1.3;
   }
 }
 
-.actionsInline {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 1.5rem;
+.nameted {
+  font-weight: 700;
+  color: #000000;
+  margin-top: 0.25rem;
 }
 
-/* Buttons */
+.receiptTitle {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Receipt Body */
+.receiptBody {
+  padding: 1rem 0;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #e5e5e5;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.label {
+  font-weight: 700;
+  color: #333333;
+  font-size: 0.85rem;
+}
+
+.value {
+  font-weight: 600;
+  color: #000000;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.tokenNumber {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #16a34a;
+  background: #f0fdf4;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+}
+
+.vehicleNumber {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #1e40af;
+  background: #eff6ff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+}
+
+/* Receipt Footer */
+.receiptFooter {
+  border-top: 2px dashed #000000;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  text-align: center;
+
+  p {
+    margin: 0.25rem 0;
+    font-size: 0.75rem;
+    color: #555555;
+  }
+}
+
+.signLabel {
+  margin-top: 1.5rem !important;
+  font-weight: 700;
+  color: #000000 !important;
+  font-size: 0.85rem !important;
+}
+
+/* Modal Actions */
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
 .primaryButton {
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
   background: linear-gradient(135deg, #06b6d4, #3b82f6);
   color: white;
   font-weight: 700;
-  text-decoration: none;
-  transition: 0.3s;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.95rem;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+  }
+}
+
+.secondaryButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  background: #64748b;
+  color: white;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+
+  &:hover {
+    background: #475569;
+    transform: translateY(-2px);
   }
 }
 
 .ghostButton {
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e2e8f0;
-  text-decoration: none;
-  transition: 0.3s;
+  border: 2px solid #06b6d4;
+  background: transparent;
+  color: #06b6d4;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.95rem;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: #06b6d4;
+    color: white;
+    transform: translateY(-2px);
   }
 }
 
-/* Animations */
+/* ====================== PRINT STYLES ====================== */
+
+@media print {
+  // body * {
+  //   visibility: hidden;
+  // }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  .hideOnPrint {
+    display: none !important;
+  }
+
+  .receipt {
+    border: 2px solid #000000;
+    page-break-inside: avoid;
+  }
+}
+
+/* ====================== ANIMATIONS ====================== */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -181,10 +565,19 @@
   }
 }
 
-@keyframes fadeInDown {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
   }
   to {
     opacity: 1;
@@ -193,6 +586,10 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
