@@ -22,7 +22,7 @@ export default function CheckInPage() {
     ownerMobile: "",
     driverName: "",
     driverMobile: "",
-    vehicleType: "Car",
+    vehicleType: "Truck",
     ratePerDay: "",
   });
 
@@ -43,7 +43,7 @@ export default function CheckInPage() {
           ownerMobile: response.data.ownerMobile || "",
           driverName: response.data.driverName || "",
           driverMobile: response.data.driverMobile || "",
-          vehicleType: response.data.vehicleType || "Car",
+          vehicleType: response.data.vehicleType || "Truck",
           ratePerDay: response.data.ratePerDay || "",
         });
         setIsExistingVehicle(true);
@@ -55,7 +55,7 @@ export default function CheckInPage() {
           ownerMobile: "",
           driverName: "",
           driverMobile: "",
-          vehicleType: "Car",
+          vehicleType: "Truck",
           ratePerDay: "",
         });
         setIsExistingVehicle(false);
@@ -69,7 +69,7 @@ export default function CheckInPage() {
         ownerMobile: "",
         driverName: "",
         driverMobile: "",
-        vehicleType: "Car",
+        vehicleType: "Truck",
         ratePerDay: "",
       });
       setIsExistingVehicle(false);

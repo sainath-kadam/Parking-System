@@ -72,15 +72,34 @@
   margin-bottom: 2rem;
 }
 
+.dateFilterRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.searchFilterSection {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+
+  .sectionLabel {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+  }
+}
+
 .filterRow {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 
 .filterGroup {
@@ -90,7 +109,7 @@
 
   label {
     color: #94a3b8;
-    font-size: 0.55rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -116,6 +135,46 @@
       color: #64748b;
     }
   }
+}
+
+.filterActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .applyBtn {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover:not(.disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .unsavedBadge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+    }
+  }
 
   .clearBtn {
     padding: 0.75rem 1.5rem;
@@ -126,13 +185,38 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: auto;
-    width: 150px;
 
     &:hover {
       background: rgba(239, 68, 68, 0.25);
       border-color: rgba(239, 68, 68, 0.5);
     }
+  }
+}
+
+.activeFilters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  flex-wrap: wrap;
+
+  .activeLabel {
+    color: #60a5fa;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .filterTag {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 }
 
@@ -528,9 +612,24 @@
     padding: 1.25rem;
   }
 
+  .dateFilterRow,
   .filterRow {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+
+  .filterActions {
+    flex-direction: column;
+    
+    .applyBtn,
+    .clearBtn {
+      width: 100%;
+    }
+  }
+
+  .activeFilters {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .statsGrid {
