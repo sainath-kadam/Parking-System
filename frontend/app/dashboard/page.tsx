@@ -7,6 +7,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell
 } from 'recharts';
 import { Car, Clock, AlertCircle, DollarSign, Activity } from 'lucide-react';
+import { getDashboardStats } from '@/services/api'; 
 
 type Filter = 'today' | 'week' | 'month';
 type Tab = 'IN' | 'OUT';
@@ -29,16 +30,21 @@ export default function DashboardPage() {
   const fetchDashboard = async () => {
     setLoading(true);
     try {
-      // once get end point will add and change 
-      const res = await fetch(`/api/dashboard?filter=${filter}`);
-      const data = await res.json();
-      setStats(data.stats);
-      setRevenueChart(data.revenueChart);
-      setPeakChart(data.peakChart);
+      const data = await getDashboardStats(filter);
+      
+      setStats(data.stats || null);
+      setRevenueChart(data.revenueChart || []);
+      setPeakChart(data.peakChart || []);
       setVehicleTypes(data.vehicleTypes || []);
-      setParkings(data.parkings);
+      setParkings(data.parkings || { IN: [], OUT: [] });
     } catch (err) {
-      console.error('Dashboard error', err);
+      console.error('Dashboard error:', err);
+      // Set empty/default values on error
+      setStats(null);
+      setRevenueChart([]);
+      setPeakChart([]);
+      setVehicleTypes([]);
+      setParkings({ IN: [], OUT: [] });
     } finally {
       setLoading(false);
     }
@@ -84,11 +90,11 @@ export default function DashboardPage() {
 
           {/* Filters */}
           <div className={styles.filters}>
-            {['today', 'week', 'month'].map(f => (
+            {(['today', 'week', 'month'] as Filter[]).map(f => (
               <button
                 key={f}
                 className={filter === f ? styles.active : ''}
-                onClick={() => setFilter(f as Filter)}
+                onClick={() => setFilter(f)}
               >
                 {f.toUpperCase()}
               </button>
@@ -268,16 +274,20 @@ export default function DashboardPage() {
                   <div>Check-in Time</div>
                   <div>Vehicle Type</div>
                 </div>
-                {parkings.IN?.map((p: any) => (
-                  <div key={p._id} className={styles.tableRow}>
-                    <div className={styles.token}>{p.tokenId}</div>
-                    <div className={styles.vehicle}>{p.vehicleNumber}</div>
-                    <div>{p.time || p.date}</div>
-                    <div>
-                      <span className={styles.badge}>{p.type || 'Car'}</span>
+                {parkings.IN?.length > 0 ? (
+                  parkings.IN.map((p: any) => (
+                    <div key={p._id} className={styles.tableRow}>
+                      <div className={styles.token}>{p.tokenId}</div>
+                      <div className={styles.vehicle}>{p.vehicleNumber}</div>
+                      <div>{p.time || p.date}</div>
+                      <div>
+                        <span className={styles.badge}>{p.type || 'Car'}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className={styles.emptyState}>No vehicles currently parked</div>
+                )}
               </>
             ) : (
               <>
@@ -288,15 +298,19 @@ export default function DashboardPage() {
                   <div>Duration</div>
                   <div>Amount</div>
                 </div>
-                {parkings.OUT?.map((p: any) => (
-                  <div key={p._id} className={styles.tableRow}>
-                    <div className={styles.token}>{p.tokenId}</div>
-                    <div className={styles.vehicle}>{p.vehicleNumber}</div>
-                    <div>{p.time || p.date}</div>
-                    <div>{p.duration || '-'}</div>
-                    <div className={styles.amount}>₹{p.amount}</div>
-                  </div>
-                ))}
+                {parkings.OUT?.length > 0 ? (
+                  parkings.OUT.map((p: any) => (
+                    <div key={p._id} className={styles.tableRow}>
+                      <div className={styles.token}>{p.tokenId}</div>
+                      <div className={styles.vehicle}>{p.vehicleNumber}</div>
+                      <div>{p.time || p.date}</div>
+                      <div>{p.duration || '-'}</div>
+                      <div className={styles.amount}>₹{p.amount}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className={styles.emptyState}>No recent checkouts</div>
+                )}
               </>
             )}
           </div>

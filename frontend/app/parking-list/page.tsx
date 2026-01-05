@@ -1,7 +1,7 @@
 // parking-list.tsx
 "use client";
 import { useState, useEffect } from "react";
-import { getAllVehicles } from "@/services/api";
+import { getAllVehiclesList } from "@/services/api";
 import styles from "./parking-list.module.scss";
 
 interface Vehicle {
@@ -24,120 +24,149 @@ interface Vehicle {
 export default function VehicleListPage() {
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
+  const [pagination, setPagination] = useState<any>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-  // Filter states
+  // Filter states - aligned with backend API
   const [filters, setFilters] = useState({
+    filter: "today" as "all" | "today" | "week" | "month" | "custom",
+    status: "all" as "all" | "active" | "completed",
+    from: "",
+    to: "",
     vehicleNumber: "",
-    ownerName: "",
-    driverName: "",
-    dateFilter: "today" as "today" | "week" | "month" | "custom",
-    customStartDate: "",
-    customEndDate: "",
+    driverMobile: "",
+    ownerMobile: "",
   });
 
+  // Separate state for text inputs (not submitted yet)
+  const [inputValues, setInputValues] = useState({
+    vehicleNumber: "",
+    driverMobile: "",
+    ownerMobile: ""
+  });
+
+  // Fetch vehicles when any filter changes
+  useEffect(() => {
+    fetchVehicles();
+  }, [
+    filters.filter, 
+    filters.status, 
+    filters.from, 
+    filters.to, 
+    filters.vehicleNumber, 
+    filters.driverMobile, 
+    filters.ownerMobile, 
+    filters.page
+  ]);
+
+  // Initial load
   useEffect(() => {
     fetchVehicles();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [filters, vehicles]);
-
   const fetchVehicles = async () => {
     setLoading(true);
     try {
-      const response = await getAllVehicles();
+      const params: any = {
+        filter: filters.filter,
+        page: filters.page
+      };
+
+      // Add status filter if not 'all'
+      if (filters.status !== 'all') {
+        params.status = filters.status;
+      }
+
+      // Only send dates for custom filter
+      if (filters.filter === 'custom' && filters.from && filters.to) {
+        params.from = filters.from;
+        params.to = filters.to;
+      }
+
+      // Add search filters if they exist
+      if (filters.vehicleNumber) params.vehicleNumber = filters.vehicleNumber;
+      if (filters.driverMobile) params.driverMobile = filters.driverMobile;
+      if (filters.ownerMobile) params.ownerMobile = filters.ownerMobile;
+
+      console.log('Fetching with params:', params); // Debug log
+
+      const response = await getAllVehiclesList(params);
+      
       if (response.success) {
-        setVehicles(response.data);
+        setVehicles(response.data || []);
+        setPagination(response.pagination);
       }
     } catch (error) {
       console.error("Failed to fetch vehicles:", error);
+      setVehicles([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const applyFilters = () => {
-    let filtered = [...vehicles];
-
-    // Filter by vehicle number
-    if (filters.vehicleNumber.trim()) {
-      filtered = filtered.filter((v) =>
-        v.vehicleNumber.toLowerCase().includes(filters.vehicleNumber.toLowerCase())
-      );
-    }
-
-    // Filter by owner name
-    if (filters.ownerName.trim()) {
-      filtered = filtered.filter((v) =>
-        v.ownerName.toLowerCase().includes(filters.ownerName.toLowerCase())
-      );
-    }
-
-    // Filter by driver name
-    if (filters.driverName.trim()) {
-      filtered = filtered.filter((v) =>
-        v.driverName?.toLowerCase().includes(filters.driverName.toLowerCase())
-      );
-    }
-
-    // Filter by date
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
-    if (filters.dateFilter === "today") {
-      filtered = filtered.filter((v) => {
-        const checkInDate = new Date(v.checkInDate);
-        checkInDate.setHours(0, 0, 0, 0);
-        return checkInDate.getTime() === now.getTime();
-      });
-    } else if (filters.dateFilter === "week") {
-      const weekAgo = new Date(now);
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      filtered = filtered.filter((v) => {
-        const checkInDate = new Date(v.checkInDate);
-        return checkInDate >= weekAgo;
-      });
-    } else if (filters.dateFilter === "month") {
-      const monthAgo = new Date(now);
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-      filtered = filtered.filter((v) => {
-        const checkInDate = new Date(v.checkInDate);
-        return checkInDate >= monthAgo;
-      });
-    } else if (filters.dateFilter === "custom") {
-      if (filters.customStartDate && filters.customEndDate) {
-        const startDate = new Date(filters.customStartDate);
-        const endDate = new Date(filters.customEndDate);
-        endDate.setHours(23, 59, 59, 999);
-
-        filtered = filtered.filter((v) => {
-          const checkInDate = new Date(v.checkInDate);
-          return checkInDate >= startDate && checkInDate <= endDate;
-        });
-      }
-    }
-
-    setFilteredVehicles(filtered);
+  // Handle date filter change (auto-fetch)
+  const handleDateFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as typeof filters.filter;
+    setFilters(prev => ({
+      ...prev,
+      filter: value,
+      from: "",
+      to: "",
+      page: 1
+    }));
   };
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Handle custom date inputs
+  const handleCustomDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const clearFilters = () => {
-    setFilters({
+  // Handle text input changes (don't fetch yet)
+  const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInputValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Apply text filters (manual trigger)
+  const handleApplyFilters = () => {
+    setFilters(prev => ({
+      ...prev,
+      vehicleNumber: inputValues.vehicleNumber.trim(),
+      driverMobile: inputValues.driverMobile.trim(),
+      ownerMobile: inputValues.ownerMobile.trim(),
+      page: 1
+    }));
+    // fetchVehicles will be called automatically by useEffect
+  };
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setInputValues({
       vehicleNumber: "",
-      ownerName: "",
-      driverName: "",
-      dateFilter: "today",
-      customStartDate: "",
-      customEndDate: "",
+      driverMobile: "",
+      ownerMobile: ""
+    });
+    setFilters({
+      filter: "today",
+      status: "all",
+      from: "",
+      to: "",
+      vehicleNumber: "",
+      driverMobile: "",
+      ownerMobile: "",
+      page: 1
     });
   };
+
+  // Check if any text filter is applied
+  const hasActiveTextFilters = filters.vehicleNumber || filters.driverMobile || filters.ownerMobile;
+
+  // Check if text inputs have unsaved changes
+  const hasUnsavedChanges = 
+    inputValues.vehicleNumber !== filters.vehicleNumber ||
+    inputValues.driverMobile !== filters.driverMobile ||
+    inputValues.ownerMobile !== filters.ownerMobile;
 
   const handleDownloadCheckIn = (vehicle: Vehicle) => {
     window.open(`/print?tokenId=${vehicle.tokenId}&checkout=false`, "_blank");
@@ -172,17 +201,9 @@ export default function VehicleListPage() {
     return `${hours}h`;
   };
 
-  const activeVehicles = filteredVehicles.filter((v) => v.status === "active");
-  const completedVehicles = filteredVehicles.filter((v) => v.status === "completed");
+  const activeVehicles = vehicles.filter((v) => v.status === "active");
+  const completedVehicles = vehicles.filter((v) => v.status === "completed");
   const totalRevenue = completedVehicles.reduce((sum, v) => sum + (v.totalAmount || 0), 0);
-
-  const isAnyFilterApplied =
-    filters.vehicleNumber.trim() !== "" ||
-    filters.ownerName.trim() !== "" ||
-    filters.driverName.trim() !== "" ||
-    filters.dateFilter !== "today" ||
-    filters.customStartDate !== "" ||
-    filters.customEndDate !== "";
 
   return (
     <div className={styles.page}>
@@ -199,15 +220,16 @@ export default function VehicleListPage() {
 
         {/* Enhanced Filters */}
         <div className={styles.filterSection}>
-          <div className={styles.filterRow}>
+          {/* Date Filters - Auto Apply */}
+          <div className={styles.dateFilterRow}>
             <div className={styles.filterGroup}>
-              <label>📅 Date Filter</label>
+              <label>📅 Date Filter (Auto-Apply)</label>
               <select
-                name="dateFilter"
-                value={filters.dateFilter}
-                onChange={handleFilterChange}
+                value={filters.filter}
+                onChange={handleDateFilterChange}
                 className={styles.filterSelect}
               >
+                <option value="all">All Time</option>
                 <option value="today">Today</option>
                 <option value="week">This Week</option>
                 <option value="month">This Month</option>
@@ -215,15 +237,28 @@ export default function VehicleListPage() {
               </select>
             </div>
 
-            {filters.dateFilter === "custom" && (
+            <div className={styles.filterGroup}>
+              <label>📊 Status Filter (Auto-Apply)</label>
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any, page: 1 }))}
+                className={styles.filterSelect}
+              >
+                <option value="all">All Status</option>
+                <option value="active">🟢 Active</option>
+                <option value="completed">✅ Completed</option>
+              </select>
+            </div>
+
+            {filters.filter === "custom" && (
               <>
                 <div className={styles.filterGroup}>
                   <label>From Date</label>
                   <input
                     type="date"
-                    name="customStartDate"
-                    value={filters.customStartDate}
-                    onChange={handleFilterChange}
+                    name="from"
+                    value={filters.from}
+                    onChange={handleCustomDateChange}
                     className={styles.filterInput}
                   />
                 </div>
@@ -231,9 +266,9 @@ export default function VehicleListPage() {
                   <label>To Date</label>
                   <input
                     type="date"
-                    name="customEndDate"
-                    value={filters.customEndDate}
-                    onChange={handleFilterChange}
+                    name="to"
+                    value={filters.to}
+                    onChange={handleCustomDateChange}
                     className={styles.filterInput}
                   />
                 </div>
@@ -241,51 +276,94 @@ export default function VehicleListPage() {
             )}
           </div>
 
-          <div className={styles.filterRow}>
-            <div className={styles.filterGroup}>
-              <label>🚙 Vehicle Number</label>
-              <input
-                type="text"
-                name="vehicleNumber"
-                value={filters.vehicleNumber}
-                onChange={handleFilterChange}
-                placeholder="KA-05-MN-1234"
-                className={styles.filterInput}
-              />
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label>👤 Owner Name</label>
-              <input
-                type="text"
-                name="ownerName"
-                value={filters.ownerName}
-                onChange={handleFilterChange}
-                placeholder="Search by owner"
-                className={styles.filterInput}
-              />
-            </div>
-
-            <div className={styles.filterGroup}>
-              <label>🧑‍✈️ Driver Name</label>
-              <input
-                type="text"
-                name="driverName"
-                value={filters.driverName}
-                onChange={handleFilterChange}
-                placeholder="Search by driver"
-                className={styles.filterInput}
-              />
-            </div>
-
-            {isAnyFilterApplied && (
+          {/* Search Filters - Manual Apply */}
+          <div className={styles.searchFilterSection}>
+            <label className={styles.sectionLabel}>
+              🔍 Search Filters (Click Apply to Search)
+            </label>
+            
+            <div className={styles.filterRow}>
               <div className={styles.filterGroup}>
-                <button onClick={clearFilters} className={styles.clearBtn}>
-                  ✖ Clear Filters
+                <label>🚙 Vehicle Number</label>
+                <input
+                  type="text"
+                  name="vehicleNumber"
+                  value={inputValues.vehicleNumber}
+                  onChange={handleTextInputChange}
+                  placeholder="KA-05-MN-1234"
+                  className={styles.filterInput}
+                />
+              </div>
+
+              <div className={styles.filterGroup}>
+                <label>🧑‍✈️ Driver Mobile</label>
+                <input
+                  type="text"
+                  name="driverMobile"
+                  value={inputValues.driverMobile}
+                  onChange={handleTextInputChange}
+                  placeholder="10 digit mobile"
+                  className={styles.filterInput}
+                />
+              </div>
+
+              <div className={styles.filterGroup}>
+                <label>👤 Owner Mobile</label>
+                <input
+                  type="text"
+                  name="ownerMobile"
+                  value={inputValues.ownerMobile}
+                  onChange={handleTextInputChange}
+                  placeholder="10 digit mobile"
+                  className={styles.filterInput}
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className={styles.filterActions}>
+              <button
+                onClick={handleApplyFilters}
+                disabled={!hasUnsavedChanges && !hasActiveTextFilters}
+                className={`${styles.applyBtn} ${(!hasUnsavedChanges && !hasActiveTextFilters) ? styles.disabled : ''}`}
+              >
+                ✓ Apply Filters
+                {hasUnsavedChanges && (
+                  <span className={styles.unsavedBadge}>Unsaved</span>
+                )}
+              </button>
+              
+              {(hasActiveTextFilters || hasUnsavedChanges) && (
+                <button
+                  onClick={handleClearFilters}
+                  className={styles.clearBtn}
+                >
+                  ✖ Clear All Filters
                 </button>
+              )}
+            </div>
+
+            {/* Active Filter Tags */}
+            {hasActiveTextFilters && (
+              <div className={styles.activeFilters}>
+                <span className={styles.activeLabel}>Active Filters:</span>
+                {filters.vehicleNumber && (
+                  <span className={styles.filterTag}>
+                    Vehicle: {filters.vehicleNumber}
+                  </span>
+                )}
+                {filters.driverMobile && (
+                  <span className={styles.filterTag}>
+                    Driver: {filters.driverMobile}
+                  </span>
+                )}
+                {filters.ownerMobile && (
+                  <span className={styles.filterTag}>
+                    Owner: {filters.ownerMobile}
+                  </span>
+                )}
               </div>
             )}
-
           </div>
         </div>
 
@@ -295,7 +373,7 @@ export default function VehicleListPage() {
             <div className={styles.statIcon}>📊</div>
             <div className={styles.statContent}>
               <span className={styles.statLabel}>Total Records</span>
-              <span className={styles.statValue}>{filteredVehicles.length}</span>
+              <span className={styles.statValue}>{vehicles.length}</span>
             </div>
           </div>
 
@@ -349,7 +427,7 @@ export default function VehicleListPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredVehicles.length === 0 ? (
+                {vehicles.length === 0 ? (
                   <tr>
                     <td colSpan={11} className={styles.emptyState}>
                       <div className={styles.emptyIcon}>🔍</div>
@@ -358,7 +436,7 @@ export default function VehicleListPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredVehicles.map((vehicle) => (
+                  vehicles.map((vehicle) => (
                     <tr key={vehicle.id} className={styles.tableRow}>
                       <td>
                         <span className={styles.token}>{vehicle.tokenId}</span>
