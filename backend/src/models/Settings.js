@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import mongoose from 'mongoose';
 
 const settingsSchema = new mongoose.Schema(
   {
@@ -67,7 +66,6 @@ const settingsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenant',
       required: true,
-      index: true
     } 
   },
   {

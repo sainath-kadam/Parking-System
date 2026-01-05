@@ -14,7 +14,6 @@ const vehicleSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenant', 
       required: true,
-      index: true
     }
   },
   { timestamps: true }

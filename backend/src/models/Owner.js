@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import mongoose from 'mongoose';
 
 const ownerSchema = new mongoose.Schema(
   {
@@ -10,7 +9,6 @@ const ownerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenant',
       required: true,
-      index: true
     } 
   },
   { timestamps: true }

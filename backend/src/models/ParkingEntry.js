@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import mongoose from 'mongoose';
 
 const parkingEntrySchema = new mongoose.Schema(
   {
@@ -52,7 +51,6 @@ const parkingEntrySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenant',
       required: true,
-      index: true
     } 
   },
   { timestamps: true }

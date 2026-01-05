@@ -53,11 +53,6 @@ export async function addTenantPayment(req, res) {
   }
 }
 
-import mongoose from 'mongoose';
-import Tenant from '../models/Tenant.js';
-import TenantBillingLedger from '../models/TenantBillingLedger.js';
-import TenantBillingLog from '../models/TenantBillingLog.js';
-
 export async function applyAdjustment(req, res) {
   const session = await mongoose.startSession();
   session.startTransaction();

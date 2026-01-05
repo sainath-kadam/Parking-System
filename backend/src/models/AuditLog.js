@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import mongoose from 'mongoose';
 
 const auditLogSchema = new mongoose.Schema(
   {
@@ -21,7 +20,6 @@ const auditLogSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tenant',
       required: true,
-      index: true
     } 
   },
   { versionKey: false }
